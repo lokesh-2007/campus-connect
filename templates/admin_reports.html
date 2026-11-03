@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Summary Reports - CampusConnect Admin Panel{% endblock %}
+
+{% block header_title %}Institutional Summary Reports{% endblock %}
+{% block header_subtitle %}Attendance aggregates and academic audit data{% endblock %}
+
+{% block content %}
+<div class="card-panel">
+    <div class="card-panel-header">
+        <h2 class="card-title">Student Attendance Aggregate Report</h2>
+        <button class="btn-secondary" onclick="exportTableToCSV('campus_attendance_report.csv')">Export CSV</button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table" id="reportTable">
+            <thead>
+                <tr>
+                    <th>Reg. ID</th>
+                    <th>Student Name</th>
+                    <th>Department</th>
+                    <th>Class</th>
+                    <th>Total Sessions</th>
+                    <th>Attended</th>
+                    <th style="text-align: right;">Attendance %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reports %}
+                {% set pct = (r.attended / r.total_sessions * 100)|round(1) if r.total_sessions > 0 else 85.0 %}
+                <tr>
+                    <td class="tabular-nums" style="font-weight: 700;">{{ r.user_id }}</td>
+                    <td style="font-weight: 600; color: #0f172a;">{{ r.name }}</td>
+                    <td>{{ r.department }}</td>
+                    <td>{{ r.class_section }}</td>
+                    <td class="tabular-nums">{{ r.total_sessions }}</td>
+                    <td class="tabular-nums">{{ r.attended or 0 }}</td>
+                    <td style="text-align: right;" class="tabular-nums">
+                        <span class="badge-status {% if pct >= 75 %}badge-eligible{% else %}badge-not-eligible{% endif %}">
+                            {{ pct }}%
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function exportTableToCSV(filename) {
+        let csv = [];
+        const rows = document.querySelectorAll("#reportTable tr");
+        for (let i = 0; i < rows.length; i++) {
+            let row = [], cols = rows[i].querySelectorAll("td, th");
+            for (let j = 0; j < cols.length; j++) 
+                row.push('"' + cols[j].innerText.trim() + '"');
+            csv.push(row.join(","));
+        }
+        const csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+        const downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    }
+</script>
+{% endblock %}

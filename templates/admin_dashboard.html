@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - CampusConnect{% endblock %}
+
+{% block header_title %}Hello, Administrator!{% endblock %}
+{% block header_subtitle %}Campus overview and administrative metrics{% endblock %}
+
+{% block content %}
+<!-- Metrics Bar (Figure 9) -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Students</div>
+        <div class="stat-value tabular-nums" style="color: #1e3a8a;">{{ total_students }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Faculty</div>
+        <div class="stat-value tabular-nums" style="color: #2563eb;">{{ total_faculty }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Courses</div>
+        <div class="stat-value tabular-nums" style="color: #475569;">{{ total_courses }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Pending Requests</div>
+        <div class="stat-value tabular-nums" style="color: #b45309;">{{ pending_requests_count }}</div>
+    </div>
+</div>
+
+<!-- Two-Column Section: Bar Chart & Recent Activity (Figure 9) -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+    <!-- Students by Department Bar Chart (Figure 9) -->
+    <div class="card-panel">
+        <div class="card-panel-header">
+            <div>
+                <h2 class="card-title">Students by Department</h2>
+                <p style="font-size: 0.75rem; color: #64748b;">Distribution across undergraduate engineering branches</p>
+            </div>
+            <a href="{{ url_for('admin_courses') }}" style="font-size: 0.8rem; color: #2563eb; text-decoration: none; font-weight: 600;">Manage Depts &rarr;</a>
+        </div>
+
+        <div class="chart-container" style="border-bottom: 2px solid #e2e8f0; padding-bottom: 12px;">
+            {% for item in dept_distribution %}
+            <div class="chart-bar-col">
+                <span class="tabular-nums" style="font-size: 0.7rem; font-weight: 700; color: #475569; margin-bottom: 4px;">{{ item.count }}</span>
+                <div class="chart-bar" style="height: {{ item.percentage }}%;" title="{{ item.name }}: {{ item.count }} students"></div>
+                <div class="chart-label">{{ item.name }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Activity Feed (Figure 9) -->
+    <div class="card-panel">
+        <div class="card-panel-header">
+            <div>
+                <h2 class="card-title">Recent Activity</h2>
+                <p style="font-size: 0.75rem; color: #64748b;">Live administrative audit logs</p>
+            </div>
+            <a href="{{ url_for('admin_reports') }}" style="font-size: 0.8rem; color: #2563eb; text-decoration: none; font-weight: 600;">Full Logs &rarr;</a>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            {% for act in recent_activities %}
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                <div>
+                    <div style="font-size: 0.875rem; font-weight: 600; color: #0f172a;">{{ act.title }}</div>
+                    <div style="font-size: 0.775rem; color: #64748b;">{{ act.detail }}</div>
+                </div>
+                <span class="tabular-nums" style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap;">{{ act.time }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

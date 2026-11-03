@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Post Notice - CampusConnect Faculty Portal{% endblock %}
+
+{% block header_title %}Class Notices & Announcements{% endblock %}
+{% block header_subtitle %}Publish notices, assignment deadlines, or syllabus updates to your students{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+    <!-- Post Notice Form -->
+    <div class="card-panel">
+        <h2 class="card-title" style="margin-bottom: 16px;">Publish New Notice</h2>
+
+        <form method="POST" action="{{ url_for('faculty_notices') }}">
+            <div class="form-group">
+                <label class="form-label" for="category">Category</label>
+                <select name="category" id="category" class="form-select" required>
+                    <option value="Assignment">Assignment Deadline</option>
+                    <option value="Exam">Internal Exam Note</option>
+                    <option value="Event">Workshop / Symposium</option>
+                    <option value="General">General Class Note</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="title">Title</label>
+                <input type="text" name="title" id="title" class="form-input" placeholder="e.g. DBMS assignment 2 due date extended" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="content">Announcement Message</label>
+                <textarea name="content" id="content" class="form-textarea" rows="4" placeholder="Detail the instructions or deadlines clearly..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Publish Notice</button>
+        </form>
+    </div>
+
+    <!-- Faculty's Published Notices -->
+    <div class="card-panel">
+        <h2 class="card-title" style="margin-bottom: 16px;">My Published Notices</h2>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            {% for n in notices %}
+            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; background: #ffffff;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span class="badge-tag tag-{{ n.category.lower() }}">{{ n.category }}</span>
+                    <span style="font-size: 0.75rem; color: #64748b;">{{ n.created_at }}</span>
+                </div>
+                <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px;">{{ n.title }}</div>
+                <p style="font-size: 0.825rem; color: #475569;">{{ n.content }}</p>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: #64748b; padding: 24px;">No notices published yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

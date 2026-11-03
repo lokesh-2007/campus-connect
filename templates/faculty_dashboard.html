@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Dashboard - CampusConnect{% endblock %}
+
+{% block header_title %}Faculty Portal{% endblock %}
+{% block header_subtitle %}Overview of assigned courses, schedule, and mentee requests{% endblock %}
+
+{% block content %}
+<!-- Quick KPI Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Assigned Courses</div>
+        <div class="stat-value tabular-nums" style="color: #2563eb;">{{ courses|length }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Pending Mentee Requests</div>
+        <div class="stat-value tabular-nums" style="color: #b45309;">{{ pending_requests|length }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Today's Lectures</div>
+        <div class="stat-value tabular-nums" style="color: #16a34a;">{{ today_classes|length }}</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+    <!-- Assigned Courses -->
+    <div class="card-panel">
+        <div class="card-panel-header">
+            <h2 class="card-title">My Assigned Courses</h2>
+            <a href="{{ url_for('faculty_attendance') }}" class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem;">Mark Attendance</a>
+        </div>
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Course Title</th>
+                        <th>Dept</th>
+                        <th style="text-align: right;">Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in courses %}
+                    <tr>
+                        <td class="tabular-nums" style="font-weight: 600;">{{ c.course_code }}</td>
+                        <td style="font-weight: 600; color: #0f172a;">{{ c.course_name }}</td>
+                        <td>{{ c.department_id }}</td>
+                        <td style="text-align: right;" class="tabular-nums">{{ c.credits }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #64748b; padding: 20px;">No courses assigned yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Mentee Requests Queue -->
+    <div class="card-panel">
+        <div class="card-panel-header">
+            <h2 class="card-title">Pending Leave/OD Requests</h2>
+            <a href="{{ url_for('faculty_requests') }}" style="font-size: 0.8rem; color: #2563eb; text-decoration: none; font-weight: 600;">Review All &rarr;</a>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for req in pending_requests %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div>
+                    <div style="font-weight: 600; color: #0f172a;">{{ req.student_name }}</div>
+                    <div style="font-size: 0.75rem; color: #64748b;">{{ req.type }} · {{ req.reason }}</div>
+                </div>
+                <a href="{{ url_for('faculty_requests') }}" class="btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; text-decoration: none;">Review</a>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: #64748b; padding: 20px;">All mentee requests are settled.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

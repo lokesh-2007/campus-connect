@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Departments & Courses - CampusConnect Admin Panel{% endblock %}
+
+{% block header_title %}Departments & Courses{% endblock %}
+{% block header_subtitle %}Manage academic branches, course codes, and faculty allocations{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+    <!-- Departments -->
+    <div class="card-panel">
+        <h2 class="card-title" style="margin-bottom: 16px;">Academic Departments</h2>
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Department Name</th>
+                        <th style="text-align: right;">Head of Dept</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in departments %}
+                    <tr>
+                        <td class="tabular-nums" style="font-weight: 700; color: #1e3a8a;">{{ d.dept_code }}</td>
+                        <td style="font-weight: 600;">{{ d.dept_name }}</td>
+                        <td style="text-align: right; color: #475569;">{{ d.head_of_dept }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Courses -->
+    <div class="card-panel">
+        <h2 class="card-title" style="margin-bottom: 16px;">Course Catalog</h2>
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Subject Title</th>
+                        <th>Sem</th>
+                        <th style="text-align: right;">Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in courses %}
+                    <tr>
+                        <td class="tabular-nums" style="font-weight: 600;">{{ c.course_code }}</td>
+                        <td style="font-weight: 600; color: #0f172a;">{{ c.course_name }}</td>
+                        <td class="tabular-nums">{{ c.semester }}</td>
+                        <td style="text-align: right;" class="tabular-nums">{{ c.credits }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

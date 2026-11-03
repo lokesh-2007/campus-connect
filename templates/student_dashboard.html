@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CampusConnect Student Portal{% endblock %}
+
+{% block header_title %}Hello, {{ student.name.split()[0] }}!{% endblock %}
+{% block header_subtitle %}Here is your academic summary for today{% endblock %}
+
+{% block content %}
+<!-- Metric KPI Cards (Figure 4) -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Overall Attendance</div>
+        <div class="stat-value highlight-green tabular-nums">{{ overall_attendance }}%</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Internal Marks Avg</div>
+        <div class="stat-value tabular-nums">{{ avg_marks }} <span style="font-size: 1.1rem; color: #64748b; font-weight: 500;">/ 50</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Pending Requests</div>
+        <div class="stat-value tabular-nums" style="color: #b45309;">{{ pending_requests_count }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">New Notices</div>
+        <div class="stat-value tabular-nums" style="color: #2563eb;">{{ new_notices_count }}</div>
+    </div>
+</div>
+
+<!-- Two-Column Grid: Today's Timetable + Latest Notices (Figure 4) -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+    <!-- Today's Timetable -->
+    <div class="card-panel">
+        <div class="card-panel-header">
+            <div>
+                <h2 class="card-title">Today's Timetable</h2>
+                <p style="font-size: 0.75rem; color: #64748b;">{{ day_name }} · {{ student.class_section or 'II B.Tech IT - A' }}</p>
+            </div>
+            <a href="{{ url_for('student_timetable') }}" style="font-size: 0.8rem; color: #2563eb; text-decoration: none; font-weight: 600;">View Weekly &rarr;</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Period</th>
+                        <th>Subject</th>
+                        <th>Faculty</th>
+                        <th style="text-align: right;">Room</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slot in timetable %}
+                    <tr>
+                        <td class="tabular-nums" style="font-weight: 600; color: #475569;">
+                            {{ slot.period_num }} · <span style="font-size: 0.75rem; font-weight: 400; color: #64748b;">{{ slot.time_slot.split(' - ')[0] }}</span>
+                        </td>
+                        <td style="font-weight: 600; color: #0f172a;">{{ slot.subject }}</td>
+                        <td style="color: #475569;">{{ slot.faculty_name }}</td>
+                        <td style="text-align: right; font-weight: 500; color: #334155;">{{ slot.room }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #64748b; padding: 24px;">No classes scheduled for today.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Latest Notices (Figure 4) -->
+    <div class="card-panel">
+        <div class="card-panel-header">
+            <div>
+                <h2 class="card-title">Latest Notices</h2>
+                <p style="font-size: 0.75rem; color: #64748b;">Announcements from administration & faculty</p>
+            </div>
+            <a href="{{ url_for('student_notices') }}" style="font-size: 0.8rem; color: #2563eb; text-decoration: none; font-weight: 600;">All Notices &rarr;</a>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+            {% for notice in latest_notices %}
+            <div style="padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span class="badge-tag tag-{{ notice.category.lower() }}">{{ notice.category }}</span>
+                    <span style="font-size: 0.75rem; color: #64748b;">{{ notice.created_at[:16] if notice.created_at else 'Recent' }}</span>
+                </div>
+                <div style="font-size: 0.875rem; font-weight: 600; color: #0f172a; margin-bottom: 4px;">{{ notice.title }}</div>
+                <p style="font-size: 0.8rem; color: #475569; line-height: 1.4;">{{ notice.content }}</p>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: #64748b; padding: 24px;">No recent notices posted.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Notices & Announcements - CampusConnect{% endblock %}
+
+{% block header_title %}Notices & Announcements{% endblock %}
+{% block header_subtitle %}Published by administration and faculty{% endblock %}
+
+{% block content %}
+<div class="card-panel">
+    <!-- Category Filter Bar -->
+    <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;">
+        <a href="{{ url_for('student_notices', category='all') }}" class="btn-secondary" style="{% if active_category == 'all' %}background: #2563eb; color: #fff; border-color: #2563eb;{% endif %} text-decoration: none;">All Notices</a>
+        <a href="{{ url_for('student_notices', category='Exam') }}" class="btn-secondary" style="{% if active_category == 'Exam' %}background: #fee2e2; color: #b91c1c; border-color: #fecaca;{% endif %} text-decoration: none;">Exams</a>
+        <a href="{{ url_for('student_notices', category='Event') }}" class="btn-secondary" style="{% if active_category == 'Event' %}background: #fef3c7; color: #b45309; border-color: #fde68a;{% endif %} text-decoration: none;">Events</a>
+        <a href="{{ url_for('student_notices', category='Holiday') }}" class="btn-secondary" style="{% if active_category == 'Holiday' %}background: #dcfce7; color: #15803d; border-color: #bbf7d0;{% endif %} text-decoration: none;">Holidays</a>
+        <a href="{{ url_for('student_notices', category='Assignment') }}" class="btn-secondary" style="{% if active_category == 'Assignment' %}background: #e0e7ff; color: #3730a3; border-color: #c7d2fe;{% endif %} text-decoration: none;">Assignments</a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+        {% for notice in notices %}
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; transition: border-color 0.15s ease;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <span class="badge-tag tag-{{ notice.category.lower() }}">{{ notice.category }}</span>
+                <span style="font-size: 0.8rem; color: #64748b;">{{ notice.publisher }} · {{ notice.created_at }}</span>
+            </div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">{{ notice.title }}</h3>
+            <p style="font-size: 0.875rem; color: #334155; line-height: 1.5;">{{ notice.content }}</p>
+        </div>
+        {% else %}
+        <p style="text-align: center; color: #64748b; padding: 32px;">No notices available in this category.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - CampusConnect Admin Panel{% endblock %}
+
+{% block header_title %}User Management{% endblock %}
+{% block header_subtitle %}Add, edit and search students and faculty{% endblock %}
+
+{% block content %}
+<div class="card-panel">
+    <!-- Search, Filter & Action Bar (Figure 10) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+        <form method="GET" action="{{ url_for('admin_users') }}" style="display: flex; gap: 10px; flex: 1; max-width: 500px;">
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Search by name or ID..." class="form-input" style="padding: 8px 14px;">
+            <select name="role" class="form-select" style="width: 140px; padding: 8px 12px;" onchange="this.form.submit()">
+                <option value="all" {% if role_filter == 'all' %}selected{% endif %}>All Roles</option>
+                <option value="student" {% if role_filter == 'student' %}selected{% endif %}>Student</option>
+                <option value="faculty" {% if role_filter == 'faculty' %}selected{% endif %}>Faculty</option>
+            </select>
+        </form>
+
+        <button type="button" class="btn-primary" onclick="openAddModal()">+ Add User</button>
+    </div>
+
+    <!-- Users Table (Figure 10) -->
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">ID</th>
+                    <th style="width: 30%;">Name</th>
+                    <th style="width: 15%;">Role</th>
+                    <th style="width: 15%;">Dept</th>
+                    <th style="width: 25%; text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td class="tabular-nums" style="font-weight: 700; color: #1e3a8a;">{{ u.user_id }}</td>
+                    <td style="font-weight: 600; color: #0f172a;">
+                        {{ u.name }}
+                        <div style="font-size: 0.75rem; color: #64748b; font-weight: normal;">{{ u.email }}</div>
+                    </td>
+                    <td>
+                        <span class="badge-status {% if u.role == 'student' %}badge-tag tag-assignment{% elif u.role == 'faculty' %}badge-tag tag-event{% else %}badge-tag tag-holiday{% endif %}" style="text-transform: capitalize;">
+                            {{ u.role }}
+                        </span>
+                    </td>
+                    <td style="font-weight: 500; color: #475569;">{{ u.department }}</td>
+                    <td style="text-align: right;">
+                        <a href="#" onclick="alert('Editing user {{ u.user_id }} profile.'); return false;" style="color: #2563eb; text-decoration: none; font-weight: 600; font-size: 0.8rem; margin-right: 12px;">Edit</a>
+                        <form method="POST" action="{{ url_for('admin_users') }}" style="display: inline;" onsubmit="return confirm('Delete user {{ u.name }} ({{ u.user_id }})?');">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="user_id" value="{{ u.user_id }}">
+                            <button type="submit" style="background: none; border: none; color: #dc2626; font-size: 0.8rem; font-weight: 600; cursor: pointer;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #64748b; padding: 24px;">No users match your search query.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add User Modal Dialog -->
+<div id="addUserModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #ffffff; border-radius: 16px; max-width: 480px; width: 100%; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">Add New User</h3>
+            <button type="button" onclick="closeAddModal()" style="background: none; border: none; font-size: 1.25rem; color: #64748b; cursor: pointer;">&times;</button>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin_users') }}">
+            <input type="hidden" name="action" value="add">
+
+            <div class="form-group">
+                <label class="form-label">User ID / Register Number</label>
+                <input type="text" name="user_id" class="form-input" placeholder="e.g. 25IT009 or F-0250" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-input" placeholder="e.g. Koushik S" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-input" placeholder="koushik@kpriet.ac.in" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select name="role" class="form-select" required>
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <select name="department" class="form-select" required>
+                        {% for d in departments %}
+                        <option value="{{ d.dept_code }}">{{ d.dept_code }} - {{ d.dept_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Default Password</label>
+                <input type="password" name="password" class="form-input" value="password123" required>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+                <button type="button" class="btn-secondary" onclick="closeAddModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Create User Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function openAddModal() {
+        document.getElementById('addUserModal').style.display = 'flex';
+    }
+    function closeAddModal() {
+        document.getElementById('addUserModal').style.display = 'none';
+    }
+</script>
+{% endblock %}

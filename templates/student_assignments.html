@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Assignments - CampusConnect{% endblock %}
+
+{% block header_title %}Assignments & Tasks{% endblock %}
+{% block header_subtitle %}Active coursework submissions and due dates{% endblock %}
+
+{% block content %}
+<div class="card-panel">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+        {% for a in assignments %}
+        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; background: #ffffff;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="badge-tag tag-assignment">{{ a.course_code }}</span>
+                <span style="font-size: 0.8rem; color: #dc2626; font-weight: 600;">Due: {{ a.due_date }}</span>
+            </div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">{{ a.title }}</h3>
+            <p style="font-size: 0.85rem; color: #475569; margin-bottom: 12px; line-height: 1.4;">{{ a.description }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                <span style="font-size: 0.75rem; color: #64748b;">Posted by {{ a.posted_by }}</span>
+                <button class="btn-primary" style="padding: 6px 14px; font-size: 0.8rem;" onclick="alert('Submission received! Assignment file recorded.');">Submit Assignment</button>
+            </div>
+        </div>
+        {% else %}
+        <p style="text-align: center; color: #64748b; padding: 32px;">No pending assignments for your class.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

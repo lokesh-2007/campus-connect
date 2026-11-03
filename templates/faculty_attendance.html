@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Mark Attendance - CampusConnect Faculty Portal{% endblock %}
+
+{% block header_title %}Mark Attendance{% endblock %}
+{% block header_subtitle %}Select class, subject and period{% endblock %}
+
+{% block content %}
+<div class="card-panel">
+    <!-- Filter Selector Bar (Figure 8) -->
+    <form method="GET" action="{{ url_for('faculty_attendance') }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <div>
+            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase;">Class</label>
+            <select name="class_name" class="form-select" onchange="this.form.submit()">
+                <option value="II B.Tech IT - A" {% if selected_class == 'II B.Tech IT - A' %}selected{% endif %}>II B.Tech IT - A</option>
+                <option value="II B.Tech CSE - B" {% if selected_class == 'II B.Tech CSE - B' %}selected{% endif %}>II B.Tech CSE - B</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase;">Subject</label>
+            <select name="subject_name" class="form-select" onchange="this.form.submit()">
+                <option value="Web Technology" {% if selected_subject == 'Web Technology' %}selected{% endif %}>Web Technology</option>
+                <option value="Data Structures" {% if selected_subject == 'Data Structures' %}selected{% endif %}>Data Structures</option>
+                <option value="Database Systems" {% if selected_subject == 'Database Systems' %}selected{% endif %}>Database Systems</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase;">Date · Period</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="date" name="date" class="form-input" value="{{ selected_date }}" onchange="this.form.submit()">
+                <select name="period" class="form-select" style="width: 90px;" onchange="this.form.submit()">
+                    <option value="1" {% if selected_period == 1 %}selected{% endif %}>P1</option>
+                    <option value="2" {% if selected_period == 2 %}selected{% endif %}>P2</option>
+                    <option value="3" {% if selected_period == 3 %}selected{% endif %}>P3</option>
+                    <option value="4" {% if selected_period == 4 %}selected{% endif %}>P4</option>
+                    <option value="5" {% if selected_period == 5 %}selected{% endif %}>P5</option>
+                </select>
+            </div>
+        </div>
+    </form>
+
+    <!-- Attendance Form (Figure 8) -->
+    <form method="POST" action="{{ url_for('faculty_attendance') }}" id="attForm">
+        <input type="hidden" name="class_name" value="{{ selected_class }}">
+        <input type="hidden" name="subject_name" value="{{ selected_subject }}">
+        <input type="hidden" name="date" value="{{ selected_date }}">
+        <input type="hidden" name="period" value="{{ selected_period }}">
+
+        <div class="table-responsive">
+            <table class="custom-table" id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Reg. No.</th>
+                        <th style="width: 50%;">Student Name</th>
+                        <th style="width: 25%; text-align: right;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td class="tabular-nums" style="font-weight: 600; color: #334155;">{{ student.user_id }}</td>
+                        <td style="font-weight: 600; color: #0f172a;">{{ student.name }}</td>
+                        <td style="text-align: right;">
+                            <input type="hidden" name="status_{{ student.user_id }}" id="status_input_{{ student.user_id }}" value="{{ student.status }}">
+                            <button type="button" 
+                                    id="btn_{{ student.user_id }}" 
+                                    class="badge-status {% if student.status == 'Present' %}badge-present{% else %}badge-absent{% endif %}" 
+                                    style="border: none; cursor: pointer; min-width: 80px; text-align: center;"
+                                    onclick="toggleStatus('{{ student.user_id }}')">
+                                {{ student.status }}
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Action Buttons & Live Counts (Figure 8) -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 16px;">
+            <div style="display: flex; gap: 12px;">
+                <button type="button" class="btn-secondary" onclick="markAllPresent()">Mark All Present</button>
+                <button type="submit" class="btn-primary">Save Attendance</button>
+            </div>
+
+            <div style="font-size: 0.875rem; color: #475569; font-weight: 600;">
+                <span style="color: #15803d;">Present: <span id="presentCount" class="tabular-nums">{{ present_count }}</span></span>
+                &nbsp;&nbsp;·&nbsp;&nbsp;
+                <span style="color: #b91c1c;">Absent: <span id="absentCount" class="tabular-nums">{{ absent_count }}</span></span>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleStatus(uid) {
+        const input = document.getElementById('status_input_' + uid);
+        const btn = document.getElementById('btn_' + uid);
+        if (input.value === 'Present') {
+            input.value = 'Absent';
+            btn.innerText = 'Absent';
+            btn.className = 'badge-status badge-absent';
+        } else {
+            input.value = 'Present';
+            btn.innerText = 'Present';
+            btn.className = 'badge-status badge-present';
+        }
+        recalcCounts();
+    }
+
+    function markAllPresent() {
+        document.querySelectorAll('input[name^="status_"]').forEach(inp => {
+            inp.value = 'Present';
+        });
+        document.querySelectorAll('button[id^="btn_"]').forEach(btn => {
+            btn.innerText = 'Present';
+            btn.className = 'badge-status badge-present';
+        });
+        recalcCounts();
+    }
+
+    function recalcCounts() {
+        let pres = 0;
+        let abs = 0;
+        document.querySelectorAll('input[name^="status_"]').forEach(inp => {
+            if (inp.value === 'Present') pres++;
+            else abs++;
+        });
+        document.getElementById('presentCount').innerText = pres;
+        document.getElementById('absentCount').innerText = abs;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,6 @@
+{
+  "name": "Campus Connect - Digital College Management System",
+  "description": "Comprehensive role-based digital college management system for Students, Faculty, and Administrators with attendance tracking, internal marks, timetables, notices, leave/OD approvals, and grievances.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

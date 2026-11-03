@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance & Marks - CampusConnect{% endblock %}
+
+{% block header_title %}Attendance & Marks{% endblock %}
+{% block header_subtitle %}Semester 3 · Internal Assessment 1{% endblock %}
+
+{% block content %}
+<div class="card-panel">
+    <div class="card-panel-header">
+        <div>
+            <h2 class="card-title">Subject-wise Report</h2>
+            <p style="font-size: 0.75rem; color: #64748b;">Detailed attendance progress and internal assessment performance</p>
+        </div>
+        <div style="font-size: 0.8rem; color: #475569;">
+            Minimum criteria: <strong style="color: #0f172a;">75% attendance</strong>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Subject</th>
+                    <th style="width: 35%;">Attendance</th>
+                    <th style="width: 20%; text-align: center;">Internal Marks</th>
+                    <th style="width: 20%; text-align: right;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in subject_reports %}
+                <tr>
+                    <td style="font-weight: 600; color: #0f172a;">
+                        {{ item.name }}
+                        <div style="font-size: 0.75rem; font-weight: 400; color: #64748b;">{{ item.code }}</div>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="flex: 1; height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden;">
+                                <div style="height: 100%; width: {{ item.attendance_pct }}%; background: {% if item.attendance_pct >= 75 %}#16a34a{% else %}#dc2626{% endif %}; border-radius: 999px;"></div>
+                            </div>
+                            <span class="tabular-nums" style="font-weight: 700; width: 44px; text-align: right; color: {% if item.attendance_pct >= 75 %}#15803d{% else %}#b91c1c{% endif %};">
+                                {{ item.attendance_pct }}%
+                            </span>
+                        </div>
+                    </td>
+                    <td class="tabular-nums" style="text-align: center; font-weight: 600; color: #1e293b;">
+                        {{ item.marks_obtained }} <span style="font-size: 0.75rem; color: #64748b; font-weight: 400;">/ {{ item.max_marks }}</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <span class="badge-status {% if item.status == 'Eligible' %}badge-eligible{% else %}badge-not-eligible{% endif %}">
+                            {{ item.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Bottom Summary Cards (Figure 5) -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Overall Attendance</div>
+        <div class="stat-value highlight-green tabular-nums">{{ overall_attendance }}%</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Total Marks</div>
+        <div class="stat-value tabular-nums">{{ total_obtained }} <span style="font-size: 1.1rem; color: #64748b; font-weight: 500;">/ {{ total_max }}</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Minimum Required</div>
+        <div class="stat-value tabular-nums" style="color: #475569;">75%</div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Campus Connect - Digital College Management System{% endblock %}</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        {% if session.get('user_id') %}
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-title">CampusConnect</div>
+                <div class="brand-subtitle">
+                    {% if current_role == 'student' %}Student Portal
+                    {% elif current_role == 'faculty' %}Faculty Portal
+                    {% elif current_role == 'admin' %}Administrator Panel
+                    {% endif %}
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                {% if current_role == 'student' %}
+                    <a href="{{ url_for('student_dashboard') }}" class="nav-item {% if request.endpoint == 'student_dashboard' %}active{% endif %}">
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('student_timetable') }}" class="nav-item {% if request.endpoint == 'student_timetable' %}active{% endif %}">
+                        <span>Timetable</span>
+                    </a>
+                    <a href="{{ url_for('student_attendance') }}" class="nav-item {% if request.endpoint == 'student_attendance' %}active{% endif %}">
+                        <span>Attendance & Marks</span>
+                    </a>
+                    <a href="{{ url_for('student_assignments') }}" class="nav-item {% if request.endpoint == 'student_assignments' %}active{% endif %}">
+                        <span>Assignments</span>
+                    </a>
+                    <a href="{{ url_for('student_notices') }}" class="nav-item {% if request.endpoint == 'student_notices' %}active{% endif %}">
+                        <span>Notices</span>
+                    </a>
+                    <a href="{{ url_for('student_requests') }}" class="nav-item {% if request.endpoint == 'student_requests' %}active{% endif %}">
+                        <span>Leave / OD</span>
+                    </a>
+                    <a href="{{ url_for('student_grievances') }}" class="nav-item {% if request.endpoint == 'student_grievances' %}active{% endif %}">
+                        <span>Grievances</span>
+                    </a>
+                {% elif current_role == 'faculty' %}
+                    <a href="{{ url_for('faculty_dashboard') }}" class="nav-item {% if request.endpoint == 'faculty_dashboard' %}active{% endif %}">
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('faculty_attendance') }}" class="nav-item {% if request.endpoint == 'faculty_attendance' %}active{% endif %}">
+                        <span>Mark Attendance</span>
+                    </a>
+                    <a href="{{ url_for('faculty_marks') }}" class="nav-item {% if request.endpoint == 'faculty_marks' %}active{% endif %}">
+                        <span>Upload Marks</span>
+                    </a>
+                    <a href="{{ url_for('faculty_requests') }}" class="nav-item {% if request.endpoint == 'faculty_requests' %}active{% endif %}">
+                        <span>Leave / OD Approvals</span>
+                    </a>
+                    <a href="{{ url_for('faculty_notices') }}" class="nav-item {% if request.endpoint == 'faculty_notices' %}active{% endif %}">
+                        <span>Notices & Tasks</span>
+                    </a>
+                {% elif current_role == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('admin_users') }}" class="nav-item {% if request.endpoint == 'admin_users' %}active{% endif %}">
+                        <span>Users</span>
+                    </a>
+                    <a href="{{ url_for('admin_courses') }}" class="nav-item {% if request.endpoint == 'admin_courses' %}active{% endif %}">
+                        <span>Departments & Courses</span>
+                    </a>
+                    <a href="{{ url_for('admin_timetable') }}" class="nav-item {% if request.endpoint == 'admin_timetable' %}active{% endif %}">
+                        <span>Timetable Master</span>
+                    </a>
+                    <a href="{{ url_for('admin_announcements') }}" class="nav-item {% if request.endpoint == 'admin_announcements' %}active{% endif %}">
+                        <span>Announcements</span>
+                    </a>
+                    <a href="{{ url_for('admin_reports') }}" class="nav-item {% if request.endpoint == 'admin_reports' %}active{% endif %}">
+                        <span>Reports & Logs</span>
+                    </a>
+                {% endif %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="btn-logout" style="display:block; text-align:center;">Sign Out</a>
+            </div>
+        </aside>
+        {% endif %}
+
+        <!-- Main Content Area -->
+        <div class="main-wrapper">
+            {% if session.get('user_id') %}
+            <header class="top-header">
+                <div>
+                    <h1 class="greeting-title">
+                        {% block header_title %}
+                            {% if current_role == 'student' %}Hello, {{ current_user.name.split()[0] }}!
+                            {% elif current_role == 'faculty' %}Faculty Portal · {{ current_user.name }}
+                            {% elif current_role == 'admin' %}Hello, Administrator!
+                            {% endif %}
+                        {% endblock %}
+                    </h1>
+                    <p class="greeting-subtitle">
+                        {% block header_subtitle %}Campus overview & academic summary for today{% endblock %}
+                    </p>
+                </div>
+
+                <div class="user-badge-container">
+                    <div class="user-meta-chip">
+                        <span>{{ current_user.name }}</span>
+                        {% if current_user.user_id %}
+                            <span style="color:#64748b; font-weight:400; margin-left:4px;">{{ current_user.user_id }}</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+                </div>
+            </header>
+            {% endif %}
+
+            <main class="page-content">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

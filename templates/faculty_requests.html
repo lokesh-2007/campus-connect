@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Leave / OD Approvals - CampusConnect Faculty Portal{% endblock %}
+
+{% block header_title %}Leave / OD Approvals{% endblock %}
+{% block header_subtitle %}Requests from your mentees{% endblock %}
+
+{% block content %}
+<div class="card-panel">
+    <h2 class="card-title" style="margin-bottom: 20px;">Pending Mentee Requests</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px;">
+        {% for req in pending_requests %}
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="font-weight: 700; color: #0f172a; font-size: 1rem;">{{ req.student_name }}</span>
+                    <span class="badge-tag {% if 'OD' in req.type %}tag-event{% else %}tag-general{% endif %}">{{ req.type }}</span>
+                </div>
+                <div class="tabular-nums" style="font-size: 0.8rem; color: #475569; margin-bottom: 4px;">
+                    {{ req.from_date }} &rarr; {{ req.to_date }}
+                </div>
+                <div style="font-size: 0.825rem; color: #64748b;">
+                    {{ req.reason }}
+                </div>
+            </div>
+
+            <!-- Action buttons (Approve / Reject) -->
+            <form method="POST" action="{{ url_for('faculty_requests') }}" style="display: flex; align-items: center; gap: 8px;">
+                <input type="hidden" name="request_id" value="{{ req.id }}">
+                <input type="text" name="remarks" placeholder="Optional remarks..." style="padding: 6px 10px; font-size: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; width: 140px;">
+                <button type="submit" name="action" value="Approve" class="btn-success">Approve</button>
+                <button type="submit" name="action" value="Reject" class="btn-danger">Reject</button>
+            </form>
+        </div>
+        {% else %}
+        <div style="padding: 24px; text-align: center; color: #64748b; background: #f8fafc; border-radius: 8px;">
+            No pending requests from mentees at this time.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Recently Decided Table (Figure 11) -->
+    <h2 class="card-title" style="margin-bottom: 16px;">Recently Decided</h2>
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Type</th>
+                    <th style="text-align: right;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in decided_requests %}
+                <tr>
+                    <td style="font-weight: 600; color: #0f172a;">{{ req.student_name }}</td>
+                    <td style="color: #475569;">{{ req.type }}</td>
+                    <td style="text-align: right;">
+                        <span class="badge-status {% if req.status == 'Approved' %}badge-approved{% else %}badge-rejected{% endif %}">
+                            {{ req.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #64748b; padding: 20px;">No historical decisions yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

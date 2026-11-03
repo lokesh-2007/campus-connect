@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusConnect - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 440px;
+            padding: 40px 32px;
+            text-align: center;
+        }
+        .login-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-bottom: 4px;
+        }
+        .login-sublogo {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 28px;
+        }
+        .welcome-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        .welcome-desc {
+            font-size: 0.825rem;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .role-selector {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 24px;
+            gap: 4px;
+        }
+        .role-btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: #475569;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .role-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+        .text-left {
+            text-align: left;
+        }
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+            font-size: 0.95rem;
+            margin-top: 8px;
+        }
+        .footer-note {
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .footer-note a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .quick-demos {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-align: left;
+        }
+        .demo-chip {
+            display: inline-block;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 2px 4px 2px 0;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-logo">CampusConnect</div>
+        <div class="login-sublogo">Digital College Management System</div>
+
+        <h2 class="welcome-title">Welcome back!</h2>
+        <p class="welcome-desc">Log in to continue</p>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" style="text-align: left;">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Role Selector Pills (Figure 3) -->
+        <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+            <input type="hidden" name="role" id="roleInput" value="{{ selected_role or 'student' }}">
+            
+            <div style="font-size: 0.75rem; color: #64748b; text-align: left; margin-bottom: 6px; font-weight: 600;">
+                Login as
+            </div>
+            <div class="role-selector">
+                <button type="button" class="role-btn {% if not selected_role or selected_role == 'student' %}active{% endif %}" onclick="selectRole('student', 'arun.k@kpriet.ac.in')">Student</button>
+                <button type="button" class="role-btn {% if selected_role == 'faculty' %}active{% endif %}" onclick="selectRole('faculty', 'kalai@kpriet.ac.in')">Faculty</button>
+                <button type="button" class="role-btn {% if selected_role == 'admin' %}active{% endif %}" onclick="selectRole('admin', 'admin@kpriet.ac.in')">Admin</button>
+            </div>
+
+            <div class="form-group text-left">
+                <label class="form-label" for="login_id">Email / ID</label>
+                <input type="text" id="login_id" name="login_id" class="form-input" placeholder="arun.k@kpriet.ac.in" value="{{ prefill_id or 'arun.k@kpriet.ac.in' }}" required autofocus>
+            </div>
+
+            <div class="form-group text-left">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-input" placeholder="••••••••••••" value="password123" required>
+            </div>
+
+            <button type="submit" class="btn-primary btn-full">Login</button>
+        </form>
+
+        <p class="footer-note">
+            <a href="#" onclick="alert('Demo notice: All accounts use password: password123'); return false;">Forgot password? Contact administrator.</a>
+        </p>
+
+        <div class="quick-demos">
+            <strong>1-Click Quick Demo Accounts:</strong><br>
+            <span class="demo-chip" onclick="fillCreds('student', 'arun.k@kpriet.ac.in')">Student: Arun Kumar</span>
+            <span class="demo-chip" onclick="fillCreds('faculty', 'kalai@kpriet.ac.in')">Faculty: Dr. Kalai</span>
+            <span class="demo-chip" onclick="fillCreds('admin', 'admin@kpriet.ac.in')">Admin</span>
+        </div>
+    </div>
+
+    <script>
+        function selectRole(role, defaultEmail) {
+            document.getElementById('roleInput').value = role;
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                if (btn.innerText.toLowerCase() === role) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            if (defaultEmail) {
+                document.getElementById('login_id').value = defaultEmail;
+            }
+        }
+
+        function fillCreds(role, email) {
+            selectRole(role, email);
+            document.getElementById('password').value = 'password123';
+        }
+    </script>
+</body>
+</html>

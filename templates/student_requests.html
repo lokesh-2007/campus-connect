@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Leave / OD Request - CampusConnect{% endblock %}
+
+{% block header_title %}Leave / OD Request{% endblock %}
+{% block header_subtitle %}Apply and track your requests{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+    <!-- New Request Form (Figure 7) -->
+    <div class="card-panel">
+        <h2 class="card-title" style="margin-bottom: 16px;">New Request</h2>
+
+        <form method="POST" action="{{ url_for('student_requests') }}">
+            <div class="form-group">
+                <label class="form-label" for="type">Type</label>
+                <select name="type" id="type" class="form-select" required>
+                    <option value="On Duty (OD)">On Duty (OD)</option>
+                    <option value="Leave">Leave</option>
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="form-group">
+                    <label class="form-label" for="from_date">From</label>
+                    <input type="date" name="from_date" id="from_date" class="form-input" value="2026-11-03" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="to_date">To</label>
+                    <input type="date" name="to_date" id="to_date" class="form-input" value="2026-11-04" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="reason">Reason</label>
+                <textarea name="reason" id="reason" class="form-textarea" rows="3" placeholder="Participation in inter-college hackathon..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Submit Request</button>
+        </form>
+    </div>
+
+    <!-- My Requests Status Table (Figure 7) -->
+    <div class="card-panel">
+        <h2 class="card-title" style="margin-bottom: 16px;">My Requests</h2>
+
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Dates</th>
+                        <th style="text-align: right;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in my_requests %}
+                    <tr>
+                        <td style="font-weight: 600; color: #0f172a;">
+                            {{ req.type }}
+                            {% if req.remarks %}
+                            <div style="font-size: 0.72rem; color: #64748b; font-weight: normal;">Note: {{ req.remarks }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="tabular-nums" style="font-size: 0.8rem; color: #475569;">
+                            {{ req.from_date }} &rarr; {{ req.to_date }}
+                        </td>
+                        <td style="text-align: right;">
+                            <span class="badge-status {% if req.status == 'Approved' %}badge-approved{% elif req.status == 'Rejected' %}badge-rejected{% else %}badge-pending{% endif %}">
+                                {{ req.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #64748b; padding: 24px;">No requests submitted yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

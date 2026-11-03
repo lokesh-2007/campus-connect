@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Timetable Master - CampusConnect Admin Panel{% endblock %}
+
+{% block header_title %}Timetable Master Management{% endblock %}
+{% block header_subtitle %}Overview of class schedules and room bookings across campus{% endblock %}
+
+{% block content %}
+<div class="card-panel">
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Day</th>
+                    <th>Period</th>
+                    <th>Time</th>
+                    <th>Subject</th>
+                    <th>Faculty</th>
+                    <th style="text-align: right;">Room</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in timetables %}
+                <tr>
+                    <td style="font-weight: 600; color: #1e3a8a;">{{ t.class_name }}</td>
+                    <td style="font-weight: 500;">{{ t.day }}</td>
+                    <td class="tabular-nums">Period {{ t.period_num }}</td>
+                    <td class="tabular-nums" style="color: #64748b; font-size: 0.8rem;">{{ t.time_slot }}</td>
+                    <td style="font-weight: 600; color: #0f172a;">{{ t.subject }}</td>
+                    <td style="color: #475569;">{{ t.faculty_name }}</td>
+                    <td style="text-align: right; font-weight: 600;">{{ t.room }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
